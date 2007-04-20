@@ -1,20 +1,20 @@
-%define name	sshdfilter
-%define version	1.4.5
-%define release	%mkrel 1
+%bcond_with     logwatch
 
-Summary:	SSH brute force attack blocker
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
-URL:		http://www.csc.liv.ac.uk/~greg/sshdfilter/
-Source0:	http://www.csc.liv.ac.uk/~greg/sshdfilter-%{version}.tar.bz2
-Group:		Monitoring
-License:	GPL
-Group:		Monitoring
-Requires(post):	iptables
+Name:           sshdfilter
+Version:        1.5.4
+Release:        %mkrel 1
+Epoch:          0
+Summary:        SSH brute force attack blocker
+License:        GPL
+Group:          Monitoring
+URL:            http://www.csc.liv.ac.uk/~greg/sshdfilter/
+Source0:        http://www.csc.liv.ac.uk/~greg/sshdfilter-%{version}.tar.gz
+Requires(post): iptables
 Requires(postun): iptables
-BuildArch:	noarch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+Requires(post): openssh-server
+Requires(postun): openssh-server
+BuildArch:        noarch
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{epoch}:%{release}-root
 
 %description
 sshdfilter blocks the frequent brute force attacks on ssh daemons, it
@@ -42,15 +42,17 @@ All new rules are inserted into a custom chain, and to prevent the chain
 from becoming overloaded with old rules, rules over a week old are
 deleted.
 
+%if %with logwatch
 %package logwatch
-Summary:	Logwatch scripts for sshdfilter
-Group:		Monitoring
-Requires:	%{name} = %{version}
+Summary:        Logwatch scripts for sshdfilter
+Group:          Monitoring
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 Requires(post): logwatch
 Requires(postun): logwatch
 
 %description logwatch
 Logwatch scripts for sshdfilter.
+%endif
 
 %prep
 %setup -q
@@ -60,15 +62,23 @@ Logwatch scripts for sshdfilter.
 %install
 %{__rm} -rf %{buildroot}
 
-%{__mkdir_p} %{buildroot}%{_sbindir}
-%{__install} -m 755 sshdfilter.rhFC30 %{buildroot}%{_sbindir}/sshdfilter
-
 %{__mkdir_p} %{buildroot}%{_sysconfdir}
-%{__install} -m 644 etc/sshdfilterrc %{buildroot}%{_sysconfdir}/sshdfilterrc
+%{__cat} etc/sshdfilterrc patterns/rhFC30.partconf > %{buildroot}%{_sysconfdir}/sshdfilterrc
 
+%{__mkdir_p} %{buildroot}%{_sbindir}
+%{__cp} -a source/sshdfilter.pl %{buildroot}%{_sbindir}/sshdfilter
+
+(cd man; sh ./pod2man.sh)
+%{__mkdir_p} %{buildroot}%{_mandir}/man1
+%{__cp} -a man/sshdfilter.1 %{buildroot}%{_mandir}/man1/sshdfilter.1
+%{__mkdir_p} %{buildroot}%{_mandir}/man5
+%{__cp} -a man/sshdfilterrc.5 %{buildroot}%{_mandir}/man5/sshdfilterrc.5
+
+%if %with logwatch
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/log.d/{conf,scripts}/services
 %{__install} -m 644 etc/log.d/conf/services/sshdfilt.conf %{buildroot}%{_sysconfdir}/log.d/conf/services/sshdfilt.conf
 %{__install} -m 644 etc/log.d/scripts/services/sshdfilt %{buildroot}%{_sysconfdir}/log.d/scripts/services/sshdfilt
+%endif
 
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %{__cat} > %{buildroot}%{_sysconfdir}/sysconfig/sshdfilter << EOF
@@ -79,7 +89,7 @@ EOF
 %{__rm} -rf %{buildroot}
 
 %post
-if [ -f %{_sysconfdir}/sysconfig/iptables ]; then
+if [ -r %{_sysconfdir}/sysconfig/iptables ]; then
     %{__perl} -pi -e 's/.*SSHD.*\n//g' %{_sysconfdir}/sysconfig/iptables
     %{__perl} -pi -e 's/COMMIT\n//g' %{_sysconfdir}/sysconfig/iptables
     %{__cat} >> %{_sysconfdir}/sysconfig/iptables << EOF
@@ -99,30 +109,37 @@ COMMIT
 EOF
 fi
 /sbin/service iptables condrestart
+/sbin/service sshd condrestart
 
 %postun
-if [ -f %{_sysconfdir}/sysconfig/iptables ]; then
+if [ -r %{_sysconfdir}/sysconfig/iptables ]; then
     %{__perl} -pi -e 's/.*SSHD.*\n//g' %{_sysconfdir}/sysconfig/iptables
 fi
 /sbin/service iptables condrestart
+/sbin/service sshd condrestart
 
+%if %with logwatch
 %post logwatch
 %{__perl} -pi -e 's/ sshdfilt//g'%{_sysconfdir}/log.d/conf/services/secure.conf
 %{__perl} -pi -e 's/ sshd/ sshd sshdfilt/g' %{_sysconfdir}/log.d/conf/services/secure.conf
 
 %postun logwatch
 %{__perl} -pi -e 's/ sshdfilt//g' %{_sysconfdir}/log.d/conf/services/secure.conf
+%endif
 
 %files
-%defattr(-,root,root)
-%doc INSTALL
-%{_sbindir}/sshdfilter
+%defattr(0644,root,root,0755)
+%doc INSTALL todo
+%attr(0755,root,root) %{_sbindir}/sshdfilter
+%{_mandir}/man1/sshdfilter.1*
+%{_mandir}/man5/sshdfilterrc.5*
 %config(noreplace) %{_sysconfdir}/sshdfilterrc
 %config(noreplace) %{_sysconfdir}/sysconfig/sshdfilter
 
+%if %with logwatch
 %files logwatch
-%defattr(-,root,root)
+%defattr(0644,root,root,0755)
 %config(noreplace) %{_sysconfdir}/log.d/conf/services/sshdfilt.conf
-%attr(755,root,root) %{_sysconfdir}/log.d/scripts/services/sshdfilt
-
+%attr(0755,root,root) %{_sysconfdir}/log.d/scripts/services/sshdfilt
+%endif
 
