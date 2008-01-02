@@ -14,6 +14,7 @@ Requires(postun): iptables
 Requires(post): openssh-server
 Requires(postun): openssh-server
 BuildArch:        noarch
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{epoch}:%{release}-root
 
 %description
 sshdfilter blocks the frequent brute force attacks on ssh daemons, it
