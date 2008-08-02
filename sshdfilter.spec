@@ -2,7 +2,7 @@
 
 Name:           sshdfilter
 Version:        1.5.4
-Release:        %mkrel 4
+Release:        %mkrel 5
 Epoch:          0
 Summary:        SSH brute force attack blocker
 License:        GPL
