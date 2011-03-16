@@ -1,8 +1,8 @@
 %bcond_with     logwatch
 
 Name:           sshdfilter
-Version:        1.5.4
-Release:        %mkrel 6
+Version:        1.5.6
+Release:        %mkrel 1
 Epoch:          0
 Summary:        SSH brute force attack blocker
 License:        GPL
