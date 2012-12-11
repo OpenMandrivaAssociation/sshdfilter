@@ -143,3 +143,64 @@ fi
 %attr(0755,root,root) %{_sysconfdir}/log.d/scripts/services/sshdfilt
 %endif
 
+
+
+%changelog
+* Wed Mar 16 2011 Stéphane Téletchéa <steletch@mandriva.org> 0:1.5.6-1mdv2011.0
++ Revision: 645430
+- update to new version 1.5.6
+
+* Tue Sep 08 2009 Thierry Vignaud <tv@mandriva.org> 0:1.5.4-6mdv2010.0
++ Revision: 434105
+- rebuild
+
+* Sat Aug 02 2008 Thierry Vignaud <tv@mandriva.org> 0:1.5.4-5mdv2009.0
++ Revision: 260994
+- rebuild
+
+* Tue Jul 29 2008 Thierry Vignaud <tv@mandriva.org> 0:1.5.4-4mdv2009.0
++ Revision: 253120
+- rebuild
+
+* Thu Mar 13 2008 Andreas Hasenack <andreas@mandriva.com> 0:1.5.4-2mdv2008.1
++ Revision: 187652
+- rebuild for 2008.1
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Sat Apr 21 2007 David Walluck <walluck@mandriva.org> 0:1.5.4-1mdv2008.0
++ Revision: 16446
+- 1.5.4
+
+
+* Sun Mar 04 2007 Emmanuel Andry <eandry@mandriva.org> 1.4.5-1mdv2007.0
++ Revision: 132730
+- New version 1.4.5
+- Import sshdfilter
+
+* Tue Jul 11 2006 David Walluck <walluck@mandriva.org> 1.4.4-1mdv2007.0
+- 1.4.4
+
+* Wed Feb 22 2006 David Walluck <walluck@mandriva.org> 1.4.3-2mdk
+- make logwatch script executable
+
+* Wed Feb 22 2006 David Walluck <walluck@mandriva.org> 1.4.3-1mdk
+- 1.4.3
+
+* Wed Nov 16 2005 Lenny Cartier <lenny@mandriva.com> 1.4.1-1mdk
+- 1.4.1
+
+* Wed Oct 12 2005 David Walluck <walluck@mandriva.org> 1.3.5-3mdk
+- use perl instead of sed
+
+* Tue Oct 11 2005 David Walluck <walluck@mandriva.org> 1.3.5-2mdk
+- fix location of %%{_sysconfdir}/sysconfig/iptables in %%postun
+- integrate with iptables
+
+* Tue Oct 04 2005 David Walluck <walluck@mandriva.org> 1.3.5-1mdk
+- release
+
