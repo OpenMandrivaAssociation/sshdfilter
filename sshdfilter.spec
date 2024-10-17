@@ -7,7 +7,7 @@ Epoch:          0
 Summary:        SSH brute force attack blocker
 License:        GPL
 Group:          Monitoring
-URL:            http://www.csc.liv.ac.uk/~greg/sshdfilter/
+URL:            https://www.csc.liv.ac.uk/~greg/sshdfilter/
 Source0:        http://www.csc.liv.ac.uk/~greg/sshdfilter-%{version}.tar.gz
 Requires(post): iptables
 Requires(postun): iptables
